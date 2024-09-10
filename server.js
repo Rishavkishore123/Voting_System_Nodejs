@@ -20,7 +20,7 @@ app.use('/umeedwar',party);
 
 
 app.listen(8009,()=>{
-    console.log("Server is running")
+    console.log("Server is running on 8009")
 })
 
 

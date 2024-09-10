@@ -1,5 +1,6 @@
 const mongoose= require('mongoose');
 const Sign_up = require('./Sign_up');
+const { jwtAuthMiddleware } = require('../jwt');
 mongoose.connect('mongodb://127.0.0.1:27017/Voting')
 
 const candidateSchema= new mongoose.Schema({
@@ -40,5 +41,7 @@ const candidateSchema= new mongoose.Schema({
         default:0
    }
 })
+
+
 
 module.exports= mongoose.model("Candidate",candidateSchema);
