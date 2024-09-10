@@ -12,7 +12,7 @@ router.post('/umeed',async(req,resp)=>{
     resp.json(results);
     }
     catch(error){
-        resp.status(401).json({error:"iNternal server error"});
+        resp.status(401).json({error:"INternal server error"});
     }
     
 })

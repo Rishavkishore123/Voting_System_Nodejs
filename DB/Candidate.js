@@ -3,7 +3,11 @@ const Sign_up = require('./Sign_up');
 mongoose.connect('mongodb://127.0.0.1:27017/Voting')
 
 const candidateSchema= new mongoose.Schema({
-    name: String,
+    name:{
+        type:String,
+        required:true
+
+    },
     
     age:{
         type:Number,
