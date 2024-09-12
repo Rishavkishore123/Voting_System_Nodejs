@@ -62,7 +62,34 @@ router.put("/:candidateID",jwtAuthMiddleware,async(req,resp)=>{
     }catch(err){
         resp.status(404).json({message:"candidate not found"})
     }
+});
+
+//delete the candidate 
+
+router.delete("/:candidateID",jwtAuthMiddleware,async(req,resp)=>{
+
+   try{
+    if(!(await checkRole(req.user.id))){
+        resp.status(401).json({message:"User does not have a admin role"})
+    }
+    const candidateID= req.params.candidateID
+    const result= await Candidate.findByIdAndDelete(candidateID)
+
+    if(!result){
+        resp.status(401).json({message:"Cannot find the candidateID"})
+    }
+
+    console.log("Data Deleted")
+
+    resp.status(200).json(result)
+
+   }catch(err){
+    resp.status(401).json({message:"Internal Server Error"})
+   }
 })
+
+//lets start voting
+
 
 
 module.exports= router;
