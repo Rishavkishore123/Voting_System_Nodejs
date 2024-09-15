@@ -22,7 +22,7 @@ const checkRole=async(userID)=>{
 router.post("/",jwtAuthMiddleware,async(req,resp)=>{
     try{
         if(!(await checkRole(req.user.id))){
-            resp.status(401).json({message:"user does not have a admin role"})
+          return resp.status(401).json({message:"user does not have a admin role"})
         }
 
         const data=req.body;
@@ -30,18 +30,18 @@ router.post("/",jwtAuthMiddleware,async(req,resp)=>{
 
         const result= await newCandidate.save();
         console.log("Data Saved");
-        resp.status(200).json({message:result})
+       return resp.status(200).json({message:result})
 
 
     }catch(err){
-        resp.status(404).json({message:"User does not saved"})
+       return resp.status(404).json({message:"User does not saved"})
     }
 })
 
 router.put("/:candidateID",jwtAuthMiddleware,async(req,resp)=>{
     try{
         if(!(await checkRole(req.user.id))){
-            resp.status(401).json({message:"user does not have a admin role"})
+           return resp.status(401).json({message:"user does not have a admin role"})
         }
 
         const candidateID=req.params.candidateID;
@@ -53,14 +53,14 @@ router.put("/:candidateID",jwtAuthMiddleware,async(req,resp)=>{
         });
 
         if(!result){
-            resp.status(401).json({message:"Internal server error"})
+           return resp.status(401).json({message:"Internal server error"})
         }
 
         console.log("Data saved");
-        resp.status(200).json(result)
+       return resp.status(200).json(result)
 
     }catch(err){
-        resp.status(404).json({message:"candidate not found"})
+        return resp.status(404).json({message:"candidate not found"})
     }
 });
 
@@ -76,19 +76,60 @@ router.delete("/:candidateID",jwtAuthMiddleware,async(req,resp)=>{
     const result= await Candidate.findByIdAndDelete(candidateID)
 
     if(!result){
-        resp.status(401).json({message:"Cannot find the candidateID"})
+        return resp.status(401).json({message:"Cannot find the candidateID"})
     }
 
     console.log("Data Deleted")
 
-    resp.status(200).json(result)
+    return resp.status(200).json(result)
 
    }catch(err){
-    resp.status(401).json({message:"Internal Server Error"})
+    return resp.status(401).json({message:"Internal Server Error"})
    }
 })
 
 //lets start voting
+
+router.post('/vote/:candidateID',jwtAuthMiddleware,async(req,resp)=>{
+
+
+        const candidateID=req.params.candidateID;
+        const userID= req.user.id;
+    try{
+        const candidate= await Candidate.findById(candidateID)
+
+        if(!candidate){
+           return resp.status(404).json({message:"Candidate not found"})
+        }
+
+        if(candidate.role==='admin'){
+            return resp.status(404).json({message:"Candidate are not allowed to vote"})
+         }
+ 
+        const user= await User.findById(userID)
+        if(!user){
+           return resp.status(404).json({message:"User not found"})
+        }
+        if(user.role==='admin'){
+            return resp.status(400).json({message:"Candidate are not allowed to vote"})
+        }
+
+        if(user.isVoted){
+            return resp.status(400).json({message:"User are already voted"})
+        }
+
+        candidate.votes.push({user: userID, votedAt: new Date()})
+        candidate.countvote++;
+        await candidate.save();
+
+        user.isVoted=true;
+        await user.save();
+        return resp.status(200).json({message:"vote recorded successfully"})
+        
+    }catch(err){
+       return resp.status(500).json({message:"Internal Server Error",error:err.message})
+    }
+})
 
 
 
