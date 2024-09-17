@@ -1,4 +1,4 @@
-const express= require('express');
+const express= require ('express');
 
 const router= express.Router();
 const {jwtAuthMiddleware,generateToken}= require('../jwt');
@@ -88,6 +88,8 @@ router.delete("/:candidateID",jwtAuthMiddleware,async(req,resp)=>{
    }
 })
 
+// ---->>> there by I have to posting the photo
+
 //lets start voting
 
 router.post('/vote/:candidateID',jwtAuthMiddleware,async(req,resp)=>{
@@ -131,6 +133,14 @@ router.post('/vote/:candidateID',jwtAuthMiddleware,async(req,resp)=>{
     }
 })
 
+//how to get the candidate list
+router.get("/",async(req,resp)=>{
+    try{
+        const candidate= await Candidate.find({},'name party-_id')
+    }catch(error){
+        resp.status(500).json({message:"Internal Server Error"})
+    }
+})
 
 
 module.exports= router;
